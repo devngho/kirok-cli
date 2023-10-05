@@ -15,7 +15,7 @@ var InitCommand = Command{
 	name:        "init",
 	description: "Initializes a new kirok project.",
 	execute: func(args []string) {
-		version := "1.1.0"
+		version := "1.0"
 
 		if len(args) > 0 {
 			version = args[0]
