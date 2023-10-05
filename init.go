@@ -15,7 +15,14 @@ var InitCommand = Command{
 	name:        "init",
 	description: "Initializes a new kirok project.",
 	execute: func(args []string) {
+		version := "1.1.0"
+
+		if len(args) > 0 {
+			version = args[0]
+		}
+
 		println("📖 kirok-cli init")
+		println("📖 Version: " + version)
 
 		projectName, targetProject, targetWasm, targetBinding := input()
 
@@ -47,7 +54,7 @@ var InitCommand = Command{
 		println(" Done!")
 
 		print("📖 Initializing kirok...")
-		kirokInit(targetProjectDir, targetWasmDir, targetBindingDir)
+		kirokInit(targetProjectDir, targetWasmDir, targetBindingDir, version)
 		println(" Done!")
 
 		println("")
@@ -155,7 +162,7 @@ func gradleInit(executable string, targetProjectDir string, projectName string) 
 	_ = cmd.Run()
 }
 
-func kirokInit(targetProjectDir string, targetWasmDir string, targetBindingDir string) {
+func kirokInit(targetProjectDir string, targetWasmDir string, targetBindingDir string, version string) {
 	// 1. Modify settings.gradle.kts
 	file, _ := os.OpenFile(filepath.Join(targetProjectDir, "settings.gradle.kts"), os.O_APPEND|os.O_WRONLY, 0644)
 	defer func() {
@@ -189,10 +196,10 @@ plugins {
     kotlin("multiplatform") version "1.9.0"
     kotlin("plugin.serialization") version "1.9.0"
     id("com.google.devtools.ksp") version "1.9.0-1.0.13"
-    id("io.github.devngho.kirok.plugin") version "1.1-SNAPSHOT"
+    id("io.github.devngho.kirok.plugin") version "%s"
 }
 
-group = "io.github.devngho"
+group = "com.example"
 version = "1.0-SNAPSHOT"
 
 repositories {
@@ -204,19 +211,19 @@ kotlin {
     jvm()
     wasm {
         binaries.executable()
-        browser {}
+        browser {
+			webpackTask {
+                enabled = false
+            }
+		}
         applyBinaryen()
     }
     sourceSets {
-        val commonMain by getting
-        val commonTest by getting
         val jvmMain by getting {
 			dependencies {
 				// Add your bindings, dependencies here
 			}
 		}
-        val wasmMain by getting
-        val wasmTest by getting
     }
 }
 
@@ -229,7 +236,7 @@ kirok {
 }
 
 dependencies.kirok(project)
-`, relWasmDir, relBindingDir, relBindingDir))
+`, filepath.ToSlash(relWasmDir), filepath.ToSlash(relBindingDir), filepath.ToSlash(relBindingDir), version))
 
 	// 3. add src directory
 	ifErrPanic(os.MkdirAll(filepath.Join(targetProjectDir, "src", "commonMain", "kotlin"), 0755))

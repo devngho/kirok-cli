@@ -42,6 +42,6 @@ var HelpCommand = Command{
 		println()
 		println("Available commands:")
 		println("  help\t\tPrints this help message.")
-		println("  init\t\tInitializes a new kirok project.")
+		println("  init [version]\t\tInitializes a new kirok project.")
 	},
 }
