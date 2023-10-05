@@ -39,8 +39,12 @@ var InitCommand = Command{
 		fmt.Printf("  Target directory (for wasm): %s\n", targetWasmDir)
 		fmt.Printf("  Target directory (for binding): %s\n", targetBindingDir)
 		println()
-		println("Enter to continue.")
-		_, _ = fmt.Scanln()
+
+		if _, err := os.Stat(targetProjectDir); err == nil {
+			println("⛔ Target directory already exists! Target directory will be overwritten.")
+			println("Enter to continue.")
+			_, _ = fmt.Scanln()
+		}
 
 		print("📖 Creating directories...")
 		ifErrPanic(os.MkdirAll(targetProjectDir, 0755))
@@ -48,8 +52,11 @@ var InitCommand = Command{
 		ifErrPanic(os.MkdirAll(targetBindingDir, 0755))
 		println(" Done!")
 
-		print("📖 Initializing Gradle projects...")
+		print("📖 Downloading Gradle...")
 		executable, _ := filepath.Abs(downloadGradle())
+		println(" Done!")
+
+		print("📖 Initializing Gradle project...")
 		gradleInit(executable, targetProjectDir, projectName)
 		println(" Done!")
 
@@ -62,7 +69,7 @@ var InitCommand = Command{
 		println("📖  What's next:")
 		println("  Set java sdk to 19 in IDEA.")
 		println("  Then add your bindings in build.gradle.kts.")
-		println("  Auto re-build projects with gradle --continuous assemble")
+		println("  Auto re-build projects with gradle --continuous assemble.")
 	},
 }
 
@@ -264,5 +271,18 @@ fun init(): Sample = Sample(0)
 fun increment(counter: Sample) {
     counter.count++
 }
+`)
+
+	// 5. add gradle.properties
+	file, _ = os.OpenFile(filepath.Join(targetProjectDir, "gradle.properties"), os.O_CREATE|os.O_WRONLY, 0644)
+	defer func() {
+		_ = file.Close()
+	}()
+	_, _ = file.WriteString(
+		`
+kotlin.code.style=official
+kotlin.incremental.native=true
+org.gradle.parallel=true
+org.gradle.caching=true
 `)
 }
