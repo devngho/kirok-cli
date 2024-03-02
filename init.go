@@ -15,7 +15,7 @@ var InitCommand = Command{
 	name:        "init",
 	description: "Initializes a new kirok project.",
 	execute: func(args []string) {
-		version := "1.0"
+		version := "1.1.0"
 
 		if len(args) > 0 {
 			version = args[0]
@@ -67,7 +67,7 @@ var InitCommand = Command{
 		println("")
 		println("🎉  Successfully initialized kirok project!")
 		println("📖  What's next:")
-		println("  Set java sdk to 19 in IDEA.")
+		println("  Set java sdk to latest in IDEA.")
 		println("  Then add your bindings in build.gradle.kts.")
 		println("  Auto re-build projects with gradle --continuous assemble.")
 	},
@@ -123,7 +123,7 @@ func unzip(src, dest string) {
 }
 
 func downloadGradle() string {
-	url := "https://downloads.gradle.org/distributions/gradle-8.3-bin.zip"
+	url := "https://downloads.gradle.org/distributions/gradle-8.5-bin.zip"
 	tempFolder := os.TempDir()
 	out, _ := os.OpenFile(filepath.Join(tempFolder, "gradle.zip"), os.O_RDONLY, 0644)
 	if _, err := out.Stat(); err != nil {
@@ -139,7 +139,7 @@ func downloadGradle() string {
 
 		unzip(filepath.Join(tempFolder, "gradle.zip"), tempFolder)
 	}
-	return filepath.Join(tempFolder, "gradle-8.3", "bin", "gradle")
+	return filepath.Join(tempFolder, "gradle-8.5", "bin", "gradle")
 }
 
 func input() (string, string, string, string) {
@@ -200,9 +200,9 @@ import io.github.devngho.kirok.plugin.kirok
 import org.jetbrains.kotlin.gradle.targets.js.binaryen.BinaryenRootPlugin
 
 plugins {
-    kotlin("multiplatform") version "1.9.0"
-    kotlin("plugin.serialization") version "1.9.0"
-    id("com.google.devtools.ksp") version "1.9.0-1.0.13"
+    kotlin("multiplatform") version "1.9.22"
+    kotlin("plugin.serialization") version "1.9.22"
+    id("com.google.devtools.ksp") version "1.9.22-1.0.17"
     id("io.github.devngho.kirok.plugin") version "%s"
 }
 
@@ -216,7 +216,7 @@ repositories {
 
 kotlin {
     jvm()
-    wasm {
+    wasmJs {
         binaries.executable()
         browser {
 			webpackTask {
@@ -226,7 +226,7 @@ kotlin {
         applyBinaryen()
     }
     sourceSets {
-        val jvmMain by getting {
+		jvmMain {
 			dependencies {
 				// Add your bindings, dependencies here
 			}
@@ -260,16 +260,17 @@ import io.github.devngho.kirok.Intent
 import io.github.devngho.kirok.Model
 import kotlinx.serialization.Serializable
 
-@Serializable
 @Model
-data class Sample(var count: Int)
+data class Sample(var count: Int) {
+	companion object {
+		@Init
+		fun init(): Sample = Sample(0)
+	}
 
-@Init
-fun init(): Sample = Sample(0)
-
-@Intent
-fun increment(counter: Sample) {
-    counter.count++
+	@Intent
+	fun increment(counter: Sample) {
+		counter.count++
+	}
 }
 `)
 
