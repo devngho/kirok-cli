@@ -1,1 +1,1 @@
-# [kirok-cli](https://kirok.nghodev.com)
+# [kirok-cli](https://kirok.ngho.dev)

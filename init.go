@@ -15,7 +15,7 @@ var InitCommand = Command{
 	name:        "init",
 	description: "Initializes a new kirok project.",
 	execute: func(args []string) {
-		version := "1.1.0"
+		version := "1.1.4"
 
 		if len(args) > 0 {
 			version = args[0]
@@ -123,7 +123,7 @@ func unzip(src, dest string) {
 }
 
 func downloadGradle() string {
-	url := "https://downloads.gradle.org/distributions/gradle-8.5-bin.zip"
+	url := "https://downloads.gradle.org/distributions/gradle-8.6-bin.zip"
 	tempFolder := os.TempDir()
 	out, _ := os.OpenFile(filepath.Join(tempFolder, "gradle.zip"), os.O_RDONLY, 0644)
 	if _, err := out.Stat(); err != nil {
@@ -139,7 +139,7 @@ func downloadGradle() string {
 
 		unzip(filepath.Join(tempFolder, "gradle.zip"), tempFolder)
 	}
-	return filepath.Join(tempFolder, "gradle-8.5", "bin", "gradle")
+	return filepath.Join(tempFolder, "gradle-8.6", "bin", "gradle")
 }
 
 func input() (string, string, string, string) {
@@ -200,9 +200,9 @@ import io.github.devngho.kirok.plugin.kirok
 import org.jetbrains.kotlin.gradle.targets.js.binaryen.BinaryenRootPlugin
 
 plugins {
-    kotlin("multiplatform") version "1.9.22"
-    kotlin("plugin.serialization") version "1.9.22"
-    id("com.google.devtools.ksp") version "1.9.22-1.0.17"
+    kotlin("multiplatform") version "2.1.0"
+    kotlin("plugin.serialization") version "2.1.0"
+    id("com.google.devtools.ksp") version "2.1.0-1.0.29"
     id("io.github.devngho.kirok.plugin") version "%s"
 }
 
@@ -240,6 +240,8 @@ kirok {
     bindingDir = "%s"
     // Add your bindings here
     binding = listOf()
+    neverUseNode = true
+    disableImportMap = true
 }
 
 dependencies.kirok(project)
